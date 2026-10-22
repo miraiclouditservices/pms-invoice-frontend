@@ -1,26 +1,275 @@
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap');
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --pms-primary: #2563EB;
+  --pms-primary-hover: #1D4ED8;
+  --pms-secondary: #64748B;
+  --pms-success: #16A34A;
+  --pms-warning: #F59E0B;
+  --pms-danger: #DC2626;
+  --pms-bg: #F8FAFC;
+  --pms-card-bg: #FFFFFF;
+  --pms-text-main: #0F172A;
+  --pms-text-muted: #64748B;
+  --pms-border: #E2E8F0;
+  --pms-sidebar-width: 260px;
+  --pms-sidebar-bg: #0F172A;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--pms-bg);
+  color: var(--pms-text-main);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: var(--pms-text-main);
+}
+
+/* Custom Buttons */
+.btn-primary {
+  background-color: var(--pms-primary) !important;
+  border-color: var(--pms-primary) !important;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary:hover {
+  background-color: var(--pms-primary-hover) !important;
+  border-color: var(--pms-primary-hover) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-outline-primary {
+  color: var(--pms-primary) !important;
+  border-color: var(--pms-primary) !important;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--pms-primary) !important;
+  color: #fff !important;
+}
+
+/* Cards */
+.pms-card {
+  background: var(--pms-card-bg);
+  border: 1px solid var(--pms-border);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.pms-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+}
+
+.stats-card {
+  background: #ffffff;
+  border: 1px solid var(--pms-border);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.2s ease;
+}
+
+.stats-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+}
+
+.stats-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+}
+
+/* Sidebar */
+.pms-sidebar {
+  width: var(--pms-sidebar-width);
+  background-color: var(--pms-sidebar-bg);
+  color: #F8FAFC;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  transition: all 0.3s;
+}
+
+.pms-sidebar .brand {
+  height: 52px;
+  padding: 0 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pms-sidebar .nav-link {
+  color: #94A3B8;
+  padding: 0.7rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 8px;
+  margin: 0.2rem 0.75rem;
+  transition: all 0.2s;
+}
+
+.pms-sidebar .nav-link:hover,
+.pms-sidebar .nav-link.active {
+  color: #FFFFFF;
+  background-color: rgba(37, 99, 235, 0.2);
+  border-left: 3px solid var(--pms-primary);
+}
+
+.pms-sidebar .nav-category {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #64748B;
+  padding: 1rem 1.25rem 0.25rem;
+  font-weight: 600;
+}
+
+/* Content Area */
+.pms-main-content {
+  margin-left: var(--pms-sidebar-width);
+  padding: 1.5rem 2rem 3rem;
+  min-height: 100vh;
+}
+
+/* Topbar */
+.pms-topbar {
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--pms-border);
+  padding: 0 1.5rem;
+  height: 52px;
+  min-height: 52px;
+  margin-left: var(--pms-sidebar-width);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+/* Badges */
+.badge-active, .badge-success-soft {
+  background-color: #DCFCE7;
+  color: #15803D;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+}
+
+.badge-pending, .badge-warning-soft {
+  background-color: #FEF3C7;
+  color: #B45309;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+}
+
+.badge-danger-soft {
+  background-color: #FEE2E2;
+  color: #B91C1C;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+}
+
+.badge-primary-soft {
+  background-color: #DBEAFE;
+  color: #1D4ED8;
+  font-weight: 600;
+  padding: 0.35rem 0.65rem;
+  border-radius: 20px;
+}
+
+/* Tables */
+.table th {
+  font-weight: 600;
+  color: #475569;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid var(--pms-border);
+  padding: 0.85rem 1rem;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.table td {
+  padding: 0.85rem 1rem;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--pms-border);
+  font-size: 0.9rem;
+}
+
+.table tbody tr:hover {
+  background-color: #F8FAFC;
+}
+
+/* Print Specific Rules for Executive PDF Generation */
+@media print {
+  body {
+    background-color: #FFFFFF !important;
+    color: #000000 !important;
+  }
+  .pms-sidebar,
+  .pms-topbar,
+  .d-print-none,
+  button,
+  .btn {
+    display: none !important;
+  }
+  .pms-main-content {
+    margin-left: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+  .reports-analytics-container {
+    padding: 0 !important;
+  }
+  .card, .pms-card, .stats-card, .bg-white {
+    box-shadow: none !important;
+    border: 1px solid #CBD5E1 !important;
+    break-inside: avoid;
+  }
+  table {
+    width: 100% !important;
+  }
+}
+
+/* Remove up/down spinner arrows from all number inputs */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+input[type=number] {
+  -moz-appearance: textfield !important;
+}
+
+/* Ensure select arrow doesn't overlap text */
+.form-select-sm {
+  padding-right: 1.75rem !important;
+  background-position: right 0.45rem center !important;
+}
+
