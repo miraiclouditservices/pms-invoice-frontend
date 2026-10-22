@@ -197,7 +197,7 @@ export const taxInvoiceApi = {
 
   // PDF Download URL
   getPdfDownloadUrl: (id: string) => {
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1';
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'https://pms-invoice-backend.onrender.com/api/v1';
     return `${baseUrl}/tax-invoices/invoices/${id}/pdf`;
   }
 };

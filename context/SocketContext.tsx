@@ -69,7 +69,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [user?._id, refreshUnreadCount]);
 
   useEffect(() => {
-    const socketInstance = io('http://localhost:5000', {
+    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com';
+    const socketInstance = io(socketUrl, {
       transports: ['websocket', 'polling']
     });
 

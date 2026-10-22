@@ -154,8 +154,8 @@ export default function NotificationsPage() {
       if (res.data?.success) {
         setStreamSession({
           token: res.data.data.sessionToken,
-          liveUrl: `http://localhost:5000${res.data.data.liveStreamUrl}`,
-          snapshotUrl: `http://localhost:5000${res.data.data.snapshotUrl}`
+          liveUrl: `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com'}${res.data.data.liveStreamUrl}`,
+          snapshotUrl: `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com'}${res.data.data.snapshotUrl}`
         });
       }
     } catch (err) {

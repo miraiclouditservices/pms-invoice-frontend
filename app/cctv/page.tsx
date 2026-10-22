@@ -82,7 +82,7 @@ export default function CctvCommandCenterPage() {
       if (res.data?.success) {
         setStreamModal({
           device,
-          streamUrl: `http://localhost:5000${res.data.data.liveStreamUrl}`,
+          streamUrl: `${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com'}${res.data.data.liveStreamUrl}`,
           token: res.data.data.sessionToken
         });
       }

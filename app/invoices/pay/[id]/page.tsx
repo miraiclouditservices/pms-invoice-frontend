@@ -58,7 +58,7 @@ export default function PublicPayInvoicePage({ params }: PageProps) {
     if (!invoice) return;
     setPaying(true);
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'http://localhost:5000';
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com';
       const paymentId = `cf_pay_${Date.now()}`;
       
       const res = await axios.post(`${API_BASE}/api/v1/webhooks/cashfree`, {

@@ -612,7 +612,7 @@ export default function AgreementsPage() {
                             <td className="text-end">
                               <div className="btn-group btn-group-sm">
                                 <a
-                                  href={`http://localhost:5000${doc.fileUrl}`}
+                                  href={`${process.env.NEXT_PUBLIC_API_URL?.replace('/api/v1', '') || 'https://pms-invoice-backend.onrender.com'}${doc.fileUrl}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="btn btn-outline-primary btn-sm py-0 px-2"
