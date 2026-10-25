@@ -55,22 +55,15 @@ export default function LandingPage() {
       <header className="sticky-top bg-white border-bottom border-light-subtle shadow-xs z-3" style={{ backdropFilter: 'blur(10px)', backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
         <div className="container-xl d-flex align-items-center justify-content-between py-3 px-3 px-md-4">
           {/* Brand Logo */}
-          <Link href="/" className="d-flex align-items-center gap-2.5 text-decoration-none">
-            <div className="d-flex align-items-center justify-content-center" style={{ width: 34, height: 34 }}>
-              {/* Mirai Stylized M Geometric Logo */}
-              <svg width="32" height="32" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M6 28L13 10L18 20L23 10L30 28" stroke="#1E40AF" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="18" cy="8" r="3" fill="#2563EB" />
-              </svg>
-            </div>
-            <div className="d-flex flex-column">
-              <span className="fw-bold text-dark lh-1" style={{ fontSize: '1.2rem', letterSpacing: '-0.02em', fontFamily: "'Poppins', sans-serif" }}>
-                Mirai Cloud
-              </span>
-              <span className="text-muted fw-semibold text-uppercase" style={{ fontSize: '0.62rem', letterSpacing: '0.18em' }}>
-                IT SERVICES
-              </span>
-            </div>
+          <Link href="/" className="d-flex align-items-center text-decoration-none py-1">
+            <Image
+              src="/landing/mirai_logo.png"
+              alt="Mirai Cloud IT Services"
+              width={160}
+              height={50}
+              style={{ height: '46px', width: 'auto', objectFit: 'contain' }}
+              priority
+            />
           </Link>
 
           {/* Navigation Menu */}
@@ -1198,14 +1191,14 @@ export default function LandingPage() {
           <div className="row g-4 justify-content-between mb-5">
             {/* Column 1: Brand / Description / Socials */}
             <div className="col-12 col-md-3">
-              <div className="d-flex align-items-center gap-2 mb-3">
-                <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 28L13 10L18 20L23 10L30 28" stroke="#3B82F6" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                  <circle cx="18" cy="8" r="3" fill="#60A5FA" />
-                </svg>
-                <span className="fw-bold text-white fs-5" style={{ fontFamily: "'Poppins', sans-serif" }}>
-                  Mirai Cloud
-                </span>
+              <div className="d-flex align-items-center mb-3">
+                <Image
+                  src="/landing/mirai_logo_dark_theme.png"
+                  alt="Mirai Cloud IT Services"
+                  width={160}
+                  height={50}
+                  style={{ height: '44px', width: 'auto', objectFit: 'contain' }}
+                />
               </div>
               <p className="small mb-4" style={{ color: '#94A3B8', fontSize: '0.88rem', lineHeight: 1.6, maxWidth: '280px' }}>
                 Secure, scalable and reliable technology solutions for businesses ready to move forward.

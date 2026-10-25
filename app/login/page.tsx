@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { apiClient } from '../../lib/apiClient';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface QuickAccount {
   _id: string;
@@ -109,39 +110,16 @@ export default function LoginPage() {
           zIndex: 10
         }}
       >
-        <div className="d-flex align-items-center gap-2">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M4 28V12L10 8V28" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M10 16L16 6V28" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M16 12L22 4V28" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M22 18L28 14V28" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M2 28H30" stroke="#1F2937" strokeWidth="2" strokeLinecap="round" />
-          </svg>
-          <div className="lh-1">
-            <div
-              className="fw-bold tracking-wider"
-              style={{
-                fontFamily: "'Poppins', sans-serif",
-                fontSize: '1.2rem',
-                letterSpacing: '0.12em',
-                color: '#1E242E'
-              }}
-            >
-              MiraiCloudItSolutions
-            </div>
-            <div
-              className="text-uppercase"
-              style={{
-                fontSize: '0.58rem',
-                letterSpacing: '0.24em',
-                color: '#64748B',
-                fontWeight: 500
-              }}
-            >
-              VISTAHOMES
-            </div>
-          </div>
-        </div>
+        <Link href="/" className="d-flex align-items-center text-decoration-none">
+          <Image
+            src="/landing/mirai_logo.png"
+            alt="Mirai Cloud IT Services"
+            width={180}
+            height={56}
+            style={{ height: '52px', width: 'auto', objectFit: 'contain' }}
+            priority
+          />
+        </Link>
       </header>
 
       {/* Main Centered / Left Viewport Area (100% Locked Viewport) */}
