@@ -38,7 +38,8 @@ apiClient.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401 && typeof window !== 'undefined') {
       const currentPath = window.location.pathname;
-      if (currentPath !== '/login') {
+      const isPublic = currentPath === '/' || currentPath === '/login' || currentPath.startsWith('/invoices/pay');
+      if (!isPublic) {
         localStorage.removeItem('pms_access_token');
         localStorage.removeItem('pms_user');
         window.location.href = '/login';

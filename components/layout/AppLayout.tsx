@@ -11,11 +11,23 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
   const router = useRouter();
   const pathname = usePathname();
 
+  const isPublicRoute = (path: string | null) => {
+    if (!path) return false;
+    return path === '/' || path === '/login' || path.startsWith('/invoices/pay');
+  };
+
+  const isPublic = isPublicRoute(pathname);
+
   useEffect(() => {
-    if (!loading && !user && pathname !== '/login') {
+    if (!loading && !user && !isPublic) {
       router.push('/login');
     }
-  }, [user, loading, pathname, router]);
+  }, [user, loading, isPublic, router]);
+
+  // Public pages render without the PMS admin sidebar/topbar
+  if (isPublic) {
+    return <>{children}</>;
+  }
 
   if (loading) {
     return (
@@ -28,8 +40,8 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
     );
   }
 
-  if (!user && pathname === '/login') {
-    return <>{children}</>;
+  if (!user) {
+    return null;
   }
 
   return (
