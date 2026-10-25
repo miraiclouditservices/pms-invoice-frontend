@@ -130,7 +130,7 @@ export default function PublicPayInvoicePage({ params }: PageProps) {
           <div className="d-inline-flex align-items-center justify-content-center p-3 bg-white rounded-circle shadow-sm mb-2">
             <i className="bi bi-shield-check text-success fs-2"></i>
           </div>
-          <h4 className="fw-bold mb-0 text-dark">{invoice.businessSnapshot?.legalName || 'Mirai Cloud Technologies'}</h4>
+          <h4 className="fw-bold mb-0 text-dark">{invoice.businessSnapshot?.legalName || 'MIRAI CLOUD IT SERVICES'}</h4>
           <span className="badge bg-primary-subtle text-primary mt-1">Cashfree Secure Payment Portal</span>
         </div>
 
@@ -213,10 +213,32 @@ export default function PublicPayInvoicePage({ params }: PageProps) {
               </div>
 
               {/* Due Date Notice */}
-              <div className="alert alert-warning d-flex align-items-center gap-2 small py-2 mb-4">
+              <div className="alert alert-warning d-flex align-items-center gap-2 small py-2 mb-3">
                 <i className="bi bi-clock-history fs-5"></i>
                 <div>
                   Payment Due Date: <strong>{formatDate(invoice.dueDate)}</strong>
+                </div>
+              </div>
+
+              {/* Direct UPI Scan & Pay Card */}
+              <div className="card border rounded-3 p-3 mb-4 bg-light text-center">
+                <div className="small fw-bold text-uppercase text-secondary mb-2" style={{ letterSpacing: '0.04em', fontSize: '0.72rem' }}>
+                  Instant Scan &amp; Pay via UPI
+                </div>
+                <div className="d-flex flex-column align-items-center">
+                  <div className="bg-white p-2 rounded-3 border shadow-xs mb-2">
+                    <img
+                      src="/landing/mirai_upi_qr.png"
+                      alt="UPI QR Code"
+                      style={{ width: '130px', height: '130px', objectFit: 'contain' }}
+                    />
+                  </div>
+                  <div className="fw-bold text-dark font-monospace" style={{ fontSize: '0.92rem' }}>
+                    miraicloudit@idfcbank
+                  </div>
+                  <div className="text-muted small mt-1" style={{ fontSize: '0.76rem' }}>
+                    Scan with Google Pay, PhonePe, Paytm, or any BHIM UPI app
+                  </div>
                 </div>
               </div>
 

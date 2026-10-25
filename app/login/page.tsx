@@ -1,46 +1,20 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import { apiClient } from '../../lib/apiClient';
 import Link from 'next/link';
 import Image from 'next/image';
-
-interface QuickAccount {
-  _id: string;
-  name: string;
-  email: string;
-  role: string;
-  isPlatformAdmin: boolean;
-  orgName: string;
-  orgType: string;
-}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [quickAccounts, setQuickAccounts] = useState<QuickAccount[]>([]);
-  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    // Fetch live accounts from backend API
-    const loadQuickAccounts = async () => {
-      try {
-        const res = await apiClient.get('/auth/quick-accounts');
-        if (res.data.success) {
-          setQuickAccounts(res.data.data.accounts);
-        }
-      } catch (err) {
-        console.error('Failed to load accounts', err);
-      }
-    };
-    loadQuickAccounts();
-  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,28 +38,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickLogin = async (acc: QuickAccount) => {
-    const pwd = 'Password@123';
-    setEmail(acc.email);
-    setPassword(pwd);
-    setShowRoleModal(false);
-    setLoading(true);
-    setError('');
-    try {
-      const success = await login(acc.email, pwd);
-      if (success) {
-        if (acc.role?.toUpperCase() === 'TAX_INVOICE_USER') {
-          router.push('/invoices/dashboard');
-        } else {
-          router.push('/dashboard');
-        }
-      }
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
     <div
@@ -172,102 +125,185 @@ export default function LoginPage() {
             )}
 
             <form onSubmit={handleLogin}>
-              {/* Email Input */}
-              <div className="mb-3">
+              {/* Email Address Input */}
+              <div className="mb-3.5">
                 <label
-                  className="form-label mb-1"
+                  htmlFor="login-email"
+                  className="form-label d-block mb-1.5 fw-semibold"
                   style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    color: '#4B5563'
+                    fontSize: '0.82rem',
+                    color: '#334155',
+                    letterSpacing: '0.01em'
                   }}
                 >
                   Email Address
                 </label>
-                <input
-                  type="email"
-                  required
-                  className="form-control"
-                  placeholder="admin@royalpalms.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  style={{
-                    height: '44px',
-                    borderRadius: '10px',
-                    borderColor: '#E5E7EB',
-                    backgroundColor: '#FFFFFF',
-                    fontSize: '0.88rem',
-                    color: '#1F2937'
-                  }}
-                />
+                <div className="position-relative">
+                  <span
+                    className="position-absolute top-50 translate-middle-y text-secondary d-flex align-items-center justify-content-center pointer-events-none"
+                    style={{ left: '14px', width: '20px', height: '20px', color: '#64748B' }}
+                  >
+                    <i className="bi bi-envelope" style={{ fontSize: '1rem' }}></i>
+                  </span>
+                  <input
+                    id="login-email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    className="form-control"
+                    placeholder="name@company.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    style={{
+                      height: '46px',
+                      paddingLeft: '44px',
+                      paddingRight: '14px',
+                      borderRadius: '12px',
+                      borderColor: '#CBD5E1',
+                      backgroundColor: '#F8FAFC',
+                      fontSize: '0.9rem',
+                      color: '#0F172A',
+                      transition: 'all 0.2s ease',
+                      boxShadow: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = '#2563EB';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      e.currentTarget.style.borderColor = '#CBD5E1';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                </div>
               </div>
 
-              {/* Password Input */}
-              <div className="mb-2">
-                <label
-                  className="form-label mb-1"
-                  style={{
-                    fontSize: '0.8rem',
-                    fontWeight: 500,
-                    color: '#4B5563'
-                  }}
-                >
-                  Password
-                </label>
-                <input
-                  type="password"
-                  required
-                  className="form-control"
-                  placeholder="••••••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  style={{
-                    height: '44px',
-                    borderRadius: '10px',
-                    borderColor: '#E5E7EB',
-                    backgroundColor: '#FFFFFF',
-                    fontSize: '0.88rem',
-                    color: '#1F2937',
-                    letterSpacing: password ? '0.2em' : 'normal'
-                  }}
-                />
+              {/* Password Input with Show/Hide Toggle */}
+              <div className="mb-3.5">
+                <div className="d-flex align-items-center justify-content-between mb-1.5">
+                  <label
+                    htmlFor="login-password"
+                    className="form-label mb-0 fw-semibold"
+                    style={{
+                      fontSize: '0.82rem',
+                      color: '#334155',
+                      letterSpacing: '0.01em'
+                    }}
+                  >
+                    Password
+                  </label>
+                  <Link
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      alert('To reset your password, please contact your organization administrator.');
+                    }}
+                    className="text-decoration-none fw-semibold"
+                    style={{
+                      fontSize: '0.78rem',
+                      color: '#2563EB',
+                      transition: 'color 0.15s ease'
+                    }}
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
+                <div className="position-relative">
+                  <span
+                    className="position-absolute top-50 translate-middle-y text-secondary d-flex align-items-center justify-content-center pointer-events-none"
+                    style={{ left: '14px', width: '20px', height: '20px', color: '#64748B' }}
+                  >
+                    <i className="bi bi-shield-lock" style={{ fontSize: '1rem' }}></i>
+                  </span>
+                  <input
+                    id="login-password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    autoComplete="current-password"
+                    className="form-control"
+                    placeholder="••••••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    style={{
+                      height: '46px',
+                      paddingLeft: '44px',
+                      paddingRight: '44px',
+                      borderRadius: '12px',
+                      borderColor: '#CBD5E1',
+                      backgroundColor: '#F8FAFC',
+                      fontSize: '0.9rem',
+                      color: '#0F172A',
+                      letterSpacing: !showPassword && password ? '0.22em' : 'normal',
+                      transition: 'all 0.2s ease',
+                      boxShadow: 'none'
+                    }}
+                    onFocus={(e) => {
+                      e.currentTarget.style.backgroundColor = '#FFFFFF';
+                      e.currentTarget.style.borderColor = '#2563EB';
+                      e.currentTarget.style.boxShadow = '0 0 0 3px rgba(37, 99, 235, 0.12)';
+                    }}
+                    onBlur={(e) => {
+                      e.currentTarget.style.backgroundColor = '#F8FAFC';
+                      e.currentTarget.style.borderColor = '#CBD5E1';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="btn btn-link position-absolute top-50 translate-middle-y text-muted p-0 d-flex align-items-center justify-content-center text-decoration-none"
+                    style={{
+                      right: '12px',
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      color: '#64748B'
+                    }}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    <i className={`bi ${showPassword ? 'bi-eye-slash-fill' : 'bi-eye-fill'}`} style={{ fontSize: '1.05rem', color: '#64748B' }}></i>
+                  </button>
+                </div>
               </div>
 
-              {/* Forgot Password */}
-              <div className="text-end mb-3">
-                <Link
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    alert('To reset credentials, please contact your organization administrator.');
-                  }}
-                  className="text-decoration-underline"
-                  style={{
-                    fontSize: '0.78rem',
-                    color: '#1F2937',
-                    fontWeight: 500
-                  }}
-                >
-                  Forgot password?
-                </Link>
+              {/* Keep me signed in */}
+              <div className="d-flex align-items-center mb-4 pt-1">
+                <div className="form-check d-flex align-items-center gap-2 mb-0">
+                  <input
+                    className="form-check-input mt-0"
+                    type="checkbox"
+                    id="rememberMe"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ cursor: 'pointer', width: '16px', height: '16px', borderRadius: '4px' }}
+                  />
+                  <label className="form-check-label user-select-none mb-0 fw-medium" htmlFor="rememberMe" style={{ color: '#64748B', cursor: 'pointer', fontSize: '0.82rem' }}>
+                    Keep me signed in
+                  </label>
+                </div>
               </div>
 
-              {/* Slate Charcoal Submit Button */}
+              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={loading}
-                className="btn w-100 text-white d-flex align-items-center justify-content-center gap-2"
+                className="btn w-100 text-white d-flex align-items-center justify-content-center gap-2 shadow-sm"
                 style={{
-                  backgroundColor: '#323946',
-                  height: '44px',
-                  borderRadius: '10px',
+                  backgroundColor: '#0F172A',
+                  height: '46px',
+                  borderRadius: '12px',
                   fontWeight: 600,
-                  fontSize: '0.92rem',
+                  fontSize: '0.95rem',
                   letterSpacing: '0.01em',
-                  transition: 'all 0.2s ease'
+                  transition: 'all 0.2s ease',
+                  border: 'none',
+                  boxShadow: '0 4px 14px rgba(15, 23, 42, 0.18)'
                 }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#232934')}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#323946')}
+                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = '#1E293B')}
+                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = '#0F172A')}
               >
                 {loading ? (
                   <>
@@ -275,159 +311,16 @@ export default function LoginPage() {
                     <span>Signing in...</span>
                   </>
                 ) : (
-                  'Sign in'
+                  <>
+                    <span>Sign in</span>
+                    <i className="bi bi-arrow-right"></i>
+                  </>
                 )}
               </button>
-              {/* Dedicated Tax Invoice Quick Fill Card */}
-              <div className="mt-3 pt-2 border-top">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setEmail('billing@pms.com');
-                    setPassword('Password@123');
-                  }}
-                  className="btn btn-sm w-100 text-start p-2 rounded-3 border transition"
-                  style={{
-                    backgroundColor: '#F0FDF4',
-                    borderColor: '#BBF7D0',
-                    transition: 'all 0.2s ease'
-                  }}
-                  title="Click to auto-fill dedicated Tax Invoice credentials"
-                >
-                  <div className="d-flex align-items-center justify-content-between">
-                    <div className="d-flex align-items-center gap-2 overflow-hidden">
-                      <div className="rounded-circle bg-success text-white d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: 26, height: 26, fontSize: '0.78rem' }}>
-                        <i className="bi bi-receipt"></i>
-                      </div>
-                      <div className="overflow-hidden">
-                        <div className="fw-bold text-success-emphasis text-truncate" style={{ fontSize: '0.78rem' }}>
-                          Tax Invoice & Cashfree Suite
-                        </div>
-                        <div className="text-secondary text-truncate" style={{ fontSize: '0.68rem' }}>
-                          billing@pms.com • Password@123
-                        </div>
-                      </div>
-                    </div>
-                    <span className="badge bg-success text-white flex-shrink-0" style={{ fontSize: '0.62rem' }}>
-                      Auto-Fill
-                    </span>
-                  </div>
-                </button>
-              </div>
             </form>
-          </div>
-
-          {/* Below Card Link (Creates NO scroll) */}
-          <div className="text-center mt-3">
-            <span style={{ fontSize: '0.82rem', color: '#6B7280' }}>
-              Are you new?{' '}
-            </span>
-            <button
-              type="button"
-              onClick={() => setShowRoleModal(true)}
-              className="btn btn-link p-0 fw-semibold text-decoration-underline"
-              style={{
-                fontSize: '0.82rem',
-                color: '#1F2937'
-              }}
-            >
-              Demo Accounts & Roles
-            </button>
           </div>
         </div>
       </main>
-
-      {/* Role Selection Modal (Popup Overlay, Zero Window Scroll) */}
-      {showRoleModal && (
-        <div
-          className="modal show d-block"
-          tabIndex={-1}
-          style={{
-            backgroundColor: 'rgba(15, 23, 42, 0.45)',
-            backdropFilter: 'blur(3px)',
-            zIndex: 1050
-          }}
-        >
-          <div className="modal-dialog modal-dialog-centered" style={{ maxWidth: '460px' }}>
-            <div
-              className="modal-content border-0 p-3"
-              style={{
-                borderRadius: '20px',
-                boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)'
-              }}
-            >
-              <div className="modal-header border-0 pb-1">
-                <div>
-                  <h6 className="modal-title fw-bold" style={{ color: '#1F2937' }}>
-                    1-Click Live Role Switcher
-                  </h6>
-                  <p className="text-muted small mb-0" style={{ fontSize: '0.75rem' }}>
-                    Select any live database account to test instant login
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowRoleModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body py-2" style={{ maxHeight: '60vh', overflowY: 'auto' }}>
-                <div className="d-flex flex-column gap-2">
-                  {quickAccounts.map((acc) => {
-                    const isTax = acc.role === 'TAX_INVOICE_USER';
-                    return (
-                      <button
-                        key={acc._id}
-                        type="button"
-                        onClick={() => handleQuickLogin(acc)}
-                        className={`btn text-start d-flex align-items-center justify-content-between py-2 px-3 rounded-3 transition ${
-                          isTax ? 'border border-success bg-success-subtle shadow-sm' : 'btn-light border-0'
-                        }`}
-                        style={{
-                          fontSize: '0.82rem',
-                          backgroundColor: isTax ? '#F0FDF4' : '#F8FAFC'
-                        }}
-                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = isTax ? '#DCFCE7' : '#EEF2F6')}
-                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = isTax ? '#F0FDF4' : '#F8FAFC')}
-                      >
-                        <div className="overflow-hidden me-2">
-                          <div className={`fw-semibold text-truncate ${isTax ? 'text-success-emphasis fw-bold' : 'text-dark'}`}>
-                            {acc.name} {isTax && '⭐ (Dedicated Suite)'}
-                          </div>
-                          <div className="text-muted text-truncate" style={{ fontSize: '0.72rem' }}>
-                            {acc.email} • Password@123
-                          </div>
-                        </div>
-                        <span
-                          className={`badge flex-shrink-0 ${isTax ? 'bg-success text-white' : ''}`}
-                          style={{
-                            backgroundColor: isTax ? undefined : '#E2E8F0',
-                            color: isTax ? undefined : '#334155',
-                            fontSize: '0.68rem',
-                            fontWeight: 600
-                          }}
-                        >
-                          {isTax ? 'Tax & Cashfree' : acc.role}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="modal-footer border-0 pt-1">
-                <button
-                  type="button"
-                  className="btn btn-sm btn-secondary"
-                  style={{ borderRadius: '8px', fontSize: '0.8rem' }}
-                  onClick={() => setShowRoleModal(false)}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -513,6 +513,34 @@ export default function InvoiceDetailsPage({ params }: PageProps) {
                   </div>
                 )}
 
+                {/* Scan & Pay via UPI */}
+                <div className="p-3 rounded-3 bg-light border mb-3 small">
+                  <div className="d-flex align-items-center justify-content-between mb-2">
+                    <span className="text-secondary small fw-bold text-uppercase d-flex align-items-center gap-1.5" style={{ fontSize: '0.7rem', letterSpacing: '0.04em' }}>
+                      <i className="bi bi-qr-code-scan text-primary"></i>
+                      <span>Scan &amp; Pay via UPI</span>
+                    </span>
+                    <span className="badge bg-success-subtle text-success border border-success-subtle">Instant Settlement</span>
+                  </div>
+                  <div className="d-flex align-items-center gap-3">
+                    <div className="bg-white p-1 rounded-2 border shadow-xs d-inline-block">
+                      <img
+                        src="/landing/mirai_upi_qr.png"
+                        alt="UPI QR Code"
+                        style={{ width: '82px', height: '82px', objectFit: 'contain' }}
+                      />
+                    </div>
+                    <div>
+                      <div className="fw-bold text-dark font-monospace mb-1" style={{ fontSize: '0.85rem' }}>
+                        miraicloudit@idfcbank
+                      </div>
+                      <div className="text-muted small" style={{ fontSize: '0.74rem', lineHeight: 1.4 }}>
+                        Scan using GPay, PhonePe, Paytm or any BHIM UPI App
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Terms and Conditions */}
                 <div className="p-3 rounded-3 bg-white border small text-muted" style={{ fontSize: '0.75rem', lineHeight: 1.5 }}>
                   <strong className="text-dark d-block mb-1">Terms & Conditions:</strong>
