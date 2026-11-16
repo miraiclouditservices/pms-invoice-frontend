@@ -57,7 +57,7 @@ export default function VisitorPassViewPage() {
       <div className="card shadow border-0 rounded-4 overflow-hidden border-top border-4 border-primary">
         {/* Pass Header */}
         <div className="bg-primary text-white p-4 text-center">
-          <div className="extra-small text-uppercase tracking-wider opacity-75">NexusPMS Multi-Tenant Security Gateway</div>
+          <div className="extra-small text-uppercase tracking-wider opacity-75">Mirai PMS Multi-Tenant Security Gateway</div>
           <h3 className="fw-bold mb-1 mt-1">{visitor.propertyName || 'Property Security Pass'}</h3>
           <span className="badge bg-white text-primary fw-bold px-3 py-1">
             DIGITAL GATE PASS • {visitor.gatePassType || 'STANDARD'}
@@ -127,7 +127,7 @@ export default function VisitorPassViewPage() {
         </div>
 
         <div className="card-footer bg-light text-center py-2 text-muted extra-small border-0">
-          Generated automatically by NexusPMS Gate Access Engine • Verified Identity
+          Generated automatically by Mirai PMS Gate Access Engine • Verified Identity
         </div>
       </div>
     </div>

@@ -36,15 +36,35 @@ export default function VisitorsMasterPage() {
     visitorName: '',
     mobile: '',
     propertyType: 'RESIDENTIAL' as PropertyType,
-    visitorType: 'GUEST',
-    hostName: '',
+    propertyId: '',
+    propertyName: '',
+    buildingId: '',
+    buildingName: '',
+    floorId: '',
+    floorName: '',
+    unitId: '',
     unitNumber: '',
+    visitorType: 'GUEST',
+    hostType: 'RESIDENT',
+    hostName: '',
+    hostMobile: '',
+    companyName: '',
     purpose: 'Walk-in Visit',
     vehicleNumber: '',
     idProofType: 'AADHAAR',
     idProofNumber: '',
     autoCheckIn: true
   });
+
+  // Hierarchy state for Walk-in Modal
+  const [hierarchyProperties, setHierarchyProperties] = useState<any[]>([]);
+  const [hierarchyBuildings, setHierarchyBuildings] = useState<any[]>([]);
+  const [hierarchyFloors, setHierarchyFloors] = useState<any[]>([]);
+  const [hierarchyUnits, setHierarchyUnits] = useState<any[]>([]);
+  const [loadingBuildings, setLoadingBuildings] = useState(false);
+  const [loadingFloors, setLoadingFloors] = useState(false);
+  const [loadingUnits, setLoadingUnits] = useState(false);
+  const [manualUnitEntry, setManualUnitEntry] = useState(false);
 
   // Delivery creation form state
   const [showDeliveryModal, setShowDeliveryModal] = useState(false);
@@ -164,6 +184,235 @@ export default function VisitorsMasterPage() {
     }
   };
 
+  // Load Hierarchy for Walk-in Registration
+  const loadHierarchyProperties = async () => {
+    try {
+      const res = await apiClient.get('/properties');
+      if (res.data.success && res.data.data) {
+        setHierarchyProperties(res.data.data);
+        return res.data.data;
+      }
+    } catch (err) {
+      console.error('Failed to load properties for walk-in:', err);
+    }
+    return [];
+  };
+
+  const loadHierarchyBuildings = async (propertyId: string) => {
+    if (!propertyId) {
+      setHierarchyBuildings([]);
+      return [];
+    }
+    setLoadingBuildings(true);
+    try {
+      const res = await apiClient.get('/structure/buildings', { params: { propertyId } });
+      if (res.data.success) {
+        setHierarchyBuildings(res.data.data || []);
+        return res.data.data || [];
+      }
+    } catch (err) {
+      console.error('Failed to load buildings:', err);
+    } finally {
+      setLoadingBuildings(false);
+    }
+    return [];
+  };
+
+  const loadHierarchyFloors = async (buildingId: string) => {
+    if (!buildingId) {
+      setHierarchyFloors([]);
+      return [];
+    }
+    setLoadingFloors(true);
+    try {
+      const res = await apiClient.get('/structure/floors', { params: { buildingId } });
+      if (res.data.success) {
+        setHierarchyFloors(res.data.data || []);
+        return res.data.data || [];
+      }
+    } catch (err) {
+      console.error('Failed to load floors:', err);
+    } finally {
+      setLoadingFloors(false);
+    }
+    return [];
+  };
+
+  const loadHierarchyUnits = async (floorId?: string, buildingId?: string) => {
+    setLoadingUnits(true);
+    try {
+      const params: any = {};
+      if (floorId) params.floorId = floorId;
+      if (buildingId) params.buildingId = buildingId;
+      const res = await apiClient.get('/structure/units', { params });
+      if (res.data.success) {
+        setHierarchyUnits(res.data.data || []);
+        return res.data.data || [];
+      }
+    } catch (err) {
+      console.error('Failed to load units:', err);
+    } finally {
+      setLoadingUnits(false);
+    }
+    return [];
+  };
+
+  const openWalkInModal = async () => {
+    setShowWalkInModal(true);
+    const props = hierarchyProperties.length > 0 ? hierarchyProperties : await loadHierarchyProperties();
+    if (props && props.length > 0) {
+      const match = props.find((p: any) => p.propertyType === walkInData.propertyType) || props[0];
+      if (match) {
+        handleWalkInPropertySelect(match._id, match.name, match.propertyType || 'RESIDENTIAL');
+      }
+    }
+  };
+
+  const handleWalkInPortfolioChange = async (pType: PropertyType) => {
+    const defaultHost = pType === 'COMMERCIAL' ? 'TENANT_EMPLOYEE' : pType === 'COWORKING' ? 'COWORKING_MEMBER' : 'RESIDENT';
+    const defaultVisitor = pType === 'COMMERCIAL' ? 'CLIENT' : pType === 'COWORKING' ? 'MEETING_GUEST' : 'GUEST';
+
+    const match = hierarchyProperties.find((p: any) => p.propertyType === pType);
+    if (match) {
+      setWalkInData(prev => ({
+        ...prev,
+        propertyType: pType,
+        hostType: defaultHost,
+        visitorType: defaultVisitor,
+        propertyId: match._id,
+        propertyName: match.name,
+        buildingId: '',
+        buildingName: '',
+        floorId: '',
+        floorName: '',
+        unitId: '',
+        unitNumber: '',
+        hostName: '',
+        hostMobile: '',
+        companyName: ''
+      }));
+      setHierarchyFloors([]);
+      setHierarchyUnits([]);
+      loadHierarchyBuildings(match._id);
+    } else {
+      setWalkInData(prev => ({
+        ...prev,
+        propertyType: pType,
+        hostType: defaultHost,
+        visitorType: defaultVisitor,
+        propertyId: '',
+        propertyName: '',
+        buildingId: '',
+        buildingName: '',
+        floorId: '',
+        floorName: '',
+        unitId: '',
+        unitNumber: '',
+        hostName: '',
+         hostMobile: '',
+        companyName: ''
+      }));
+      setHierarchyBuildings([]);
+      setHierarchyFloors([]);
+      setHierarchyUnits([]);
+    }
+  };
+
+  const handleWalkInPropertySelect = async (propId: string, propName: string, propType: PropertyType) => {
+    const defaultHost = propType === 'COMMERCIAL' ? 'TENANT_EMPLOYEE' : propType === 'COWORKING' ? 'COWORKING_MEMBER' : 'RESIDENT';
+    const defaultVisitor = propType === 'COMMERCIAL' ? 'CLIENT' : propType === 'COWORKING' ? 'MEETING_GUEST' : 'GUEST';
+
+    setWalkInData(prev => ({
+      ...prev,
+      propertyId: propId,
+      propertyName: propName,
+      propertyType: propType,
+      hostType: defaultHost,
+      visitorType: defaultVisitor,
+      buildingId: '',
+      buildingName: '',
+      floorId: '',
+      floorName: '',
+      unitId: '',
+      unitNumber: '',
+      hostName: '',
+      hostMobile: '',
+      companyName: ''
+    }));
+    setHierarchyFloors([]);
+    setHierarchyUnits([]);
+    loadHierarchyBuildings(propId);
+  };
+
+  const handleWalkInBuildingSelect = async (bldgId: string, bldgName: string) => {
+    setWalkInData(prev => ({
+      ...prev,
+      buildingId: bldgId,
+      buildingName: bldgName,
+      floorId: '',
+      floorName: '',
+      unitId: '',
+      unitNumber: '',
+      hostName: '',
+      hostMobile: '',
+      companyName: ''
+    }));
+    setHierarchyUnits([]);
+    loadHierarchyFloors(bldgId);
+    loadHierarchyUnits(undefined, bldgId);
+  };
+
+  const handleWalkInFloorSelect = async (flrId: string, flrName: string) => {
+    setWalkInData(prev => ({
+      ...prev,
+      floorId: flrId,
+      floorName: flrName,
+      unitId: '',
+      unitNumber: '',
+      hostName: '',
+      hostMobile: '',
+      companyName: ''
+    }));
+    loadHierarchyUnits(flrId, walkInData.buildingId);
+  };
+
+  const handleWalkInUnitSelect = (selectedUnitId: string) => {
+    if (selectedUnitId === 'MANUAL') {
+      setManualUnitEntry(true);
+      setWalkInData(prev => ({ ...prev, unitId: '', unitNumber: '' }));
+      return;
+    }
+    setManualUnitEntry(false);
+    const unit = hierarchyUnits.find(u => u._id === selectedUnitId);
+    if (!unit) return;
+
+    let hName = walkInData.hostName;
+    let hMobile = walkInData.hostMobile;
+    let cName = walkInData.companyName;
+
+    if (walkInData.propertyType === 'RESIDENTIAL' && unit.currentResidentId) {
+      hName = unit.currentResidentId.name || unit.currentResidentId.fullName || hName;
+      hMobile = unit.currentResidentId.mobile || hMobile;
+    } else if (walkInData.propertyType === 'COMMERCIAL' && unit.currentTenantCompanyId) {
+      cName = unit.currentTenantCompanyId.companyName || cName;
+      hName = unit.currentTenantCompanyId.contactPerson || unit.currentTenantCompanyId.companyName || hName;
+      hMobile = unit.currentTenantCompanyId.mobile || unit.currentTenantCompanyId.phone || hMobile;
+    } else if (walkInData.propertyType === 'COWORKING' && unit.currentMemberId) {
+      hName = unit.currentMemberId.memberName || hName;
+      cName = unit.currentMemberId.companyName || cName;
+      hMobile = unit.currentMemberId.mobile || hMobile;
+    }
+
+    setWalkInData(prev => ({
+      ...prev,
+      unitId: unit._id,
+      unitNumber: unit.unitNumber || unit.spaceNumber || unit.flatNumber || '',
+      hostName: hName,
+      hostMobile: hMobile,
+      companyName: cName
+    }));
+  };
+
   // Walk-in Registration
   const handleWalkInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -247,7 +496,7 @@ export default function VisitorsMasterPage() {
           </p>
         </div>
         <div className="d-flex align-items-center gap-2">
-          <button onClick={() => setShowWalkInModal(true)} className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
+          <button onClick={openWalkInModal} className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 shadow-sm">
             <i className="bi bi-person-walking"></i> Register Walk-In
           </button>
           <button onClick={() => setShowDeliveryModal(true)} className="btn btn-outline-info btn-sm d-flex align-items-center gap-1 shadow-sm">
@@ -998,108 +1247,467 @@ export default function VisitorsMasterPage() {
 
       {/* MODAL: WALK-IN REGISTRATION */}
       {showWalkInModal && (
-        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title fw-bold"><i className="bi bi-person-walking me-1"></i> Register Walk-in Visitor</h5>
-                <button type="button" className="btn-close" onClick={() => setShowWalkInModal(false)}></button>
-              </div>
-              <form onSubmit={handleWalkInSubmit}>
-                <div className="modal-body p-4">
-                  <div className="row g-3">
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Visitor Name *</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        required
-                        value={walkInData.visitorName}
-                        onChange={(e) => setWalkInData({ ...walkInData, visitorName: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Mobile Number *</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        required
-                        value={walkInData.mobile}
-                        onChange={(e) => setWalkInData({ ...walkInData, mobile: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Property Portfolio</label>
-                      <select
-                        className="form-select form-select-sm"
-                        value={walkInData.propertyType}
-                        onChange={(e) => setWalkInData({ ...walkInData, propertyType: e.target.value as PropertyType })}
-                      >
-                        <option value="RESIDENTIAL">Residential (Apartment)</option>
-                        <option value="COMMERCIAL">Commercial (Tech Park)</option>
-                        <option value="COWORKING">Co-working (Flexible Space)</option>
-                      </select>
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Visitor Type</label>
-                      <select
-                        className="form-select form-select-sm"
-                        value={walkInData.visitorType}
-                        onChange={(e) => setWalkInData({ ...walkInData, visitorType: e.target.value })}
-                      >
-                        <option value="GUEST">Guest</option>
-                        <option value="CLIENT">Client</option>
-                        <option value="SERVICE_TECHNICIAN">Technician</option>
-                        <option value="CAB_DRIVER">Cab Driver</option>
-                        <option value="INTERVIEW_CANDIDATE">Interviewee</option>
-                      </select>
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Host Name *</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        required
-                        placeholder="Resident / Employee / Member"
-                        value={walkInData.hostName}
-                        onChange={(e) => setWalkInData({ ...walkInData, hostName: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Unit / Flat / Office Number *</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        required
-                        placeholder="e.g. A-101 or Suite 301"
-                        value={walkInData.unitNumber}
-                        onChange={(e) => setWalkInData({ ...walkInData, unitNumber: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Vehicle Plate (Optional)</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm text-uppercase"
-                        placeholder="e.g. MH 02 AB 1234"
-                        value={walkInData.vehicleNumber}
-                        onChange={(e) => setWalkInData({ ...walkInData, vehicleNumber: e.target.value })}
-                      />
-                    </div>
-                    <div className="col-12 col-md-6">
-                      <label className="form-label small fw-semibold">Purpose of Visit</label>
-                      <input
-                        type="text"
-                        className="form-control form-control-sm"
-                        value={walkInData.purpose}
-                        onChange={(e) => setWalkInData({ ...walkInData, purpose: e.target.value })}
-                      />
-                    </div>
+        <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(3px)' }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg">
+            <div className="modal-content shadow-lg border-0 rounded-3">
+              <div className="modal-header bg-dark text-white py-3 px-4">
+                <div className="d-flex align-items-center gap-2">
+                  <div className="bg-primary text-white p-2 rounded-circle d-flex align-items-center justify-content-center" style={{ width: 36, height: 36 }}>
+                    <i className="bi bi-person-walking fs-5"></i>
+                  </div>
+                  <div>
+                    <h5 className="modal-title fw-bold mb-0">Register Walk-in Visitor</h5>
+                    <small className="text-light opacity-75">Fast-track gate pass with real-time portfolio & structure hierarchy</small>
                   </div>
                 </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowWalkInModal(false)}>Cancel</button>
-                  <button type="submit" className="btn btn-primary btn-sm">Register & Admit</button>
+                <button type="button" className="btn-close btn-close-white" onClick={() => setShowWalkInModal(false)}></button>
+              </div>
+
+              <form onSubmit={handleWalkInSubmit}>
+                <div className="modal-body p-4" style={{ maxHeight: '78vh', overflowY: 'auto' }}>
+                  
+                  {/* SECTION 1: PORTFOLIO & PROPERTY */}
+                  <div className="p-3 mb-3 rounded-3 border bg-light">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="fw-bold small text-uppercase text-secondary tracking-wide">
+                        <i className="bi bi-building me-1 text-primary"></i> 1. Portfolio & Property Selection
+                      </span>
+                      <span className={`badge ${
+                        walkInData.propertyType === 'RESIDENTIAL' ? 'bg-success' :
+                        walkInData.propertyType === 'COMMERCIAL' ? 'bg-primary' : 'bg-warning text-dark'
+                      }`}>
+                        {walkInData.propertyType}
+                      </span>
+                    </div>
+
+                    {/* Portfolio Type Segmented Control */}
+                    <div className="row g-2 mb-3">
+                      <div className="col-4">
+                        <button
+                          type="button"
+                          className={`btn btn-sm w-100 py-2 d-flex flex-column align-items-center justify-content-center gap-1 ${
+                            walkInData.propertyType === 'RESIDENTIAL' ? 'btn-primary shadow-sm fw-bold' : 'btn-outline-secondary'
+                          }`}
+                          onClick={() => handleWalkInPortfolioChange('RESIDENTIAL')}
+                        >
+                          <i className="bi bi-house-door"></i>
+                          <span>Residential</span>
+                        </button>
+                      </div>
+                      <div className="col-4">
+                        <button
+                          type="button"
+                          className={`btn btn-sm w-100 py-2 d-flex flex-column align-items-center justify-content-center gap-1 ${
+                            walkInData.propertyType === 'COMMERCIAL' ? 'btn-primary shadow-sm fw-bold' : 'btn-outline-secondary'
+                          }`}
+                          onClick={() => handleWalkInPortfolioChange('COMMERCIAL')}
+                        >
+                          <i className="bi bi-buildings"></i>
+                          <span>Commercial</span>
+                        </button>
+                      </div>
+                      <div className="col-4">
+                        <button
+                          type="button"
+                          className={`btn btn-sm w-100 py-2 d-flex flex-column align-items-center justify-content-center gap-1 ${
+                            walkInData.propertyType === 'COWORKING' ? 'btn-primary shadow-sm fw-bold' : 'btn-outline-secondary'
+                          }`}
+                          onClick={() => handleWalkInPortfolioChange('COWORKING')}
+                        >
+                          <i className="bi bi-laptop"></i>
+                          <span>Co-working</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Property Selector */}
+                    <div>
+                      <label className="form-label small fw-semibold text-dark">
+                        Select Property / Complex *
+                      </label>
+                      <select
+                        className="form-select form-select-sm"
+                        required
+                        value={walkInData.propertyId}
+                        onChange={(e) => {
+                          const p = hierarchyProperties.find(item => item._id === e.target.value);
+                          if (p) {
+                            handleWalkInPropertySelect(p._id, p.name, p.propertyType || walkInData.propertyType);
+                          }
+                        }}
+                      >
+                        <option value="">-- Choose Property --</option>
+                        {hierarchyProperties
+                          .filter(p => !walkInData.propertyType || p.propertyType === walkInData.propertyType)
+                          .map((prop) => (
+                            <option key={prop._id} value={prop._id}>
+                              {prop.name} ({prop.propertyType} - {prop.city || 'Campus'})
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* SECTION 2: CASCADING STRUCTURE (Building -> Floor -> Unit/Space) */}
+                  <div className="p-3 mb-3 rounded-3 border bg-light">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="fw-bold small text-uppercase text-secondary tracking-wide">
+                        <i className="bi bi-layers me-1 text-primary"></i> 2. Dynamic Hierarchy (Building &rarr; Floor &rarr; Space)
+                      </span>
+                    </div>
+
+                    <div className="row g-3">
+                      {/* Building / Tower Dropdown */}
+                      <div className="col-12 col-md-4">
+                        <label className="form-label small fw-semibold">
+                          {walkInData.propertyType === 'COMMERCIAL'
+                            ? 'Office Tower / Wing'
+                            : walkInData.propertyType === 'COWORKING'
+                            ? 'Hub / Centre'
+                            : 'Tower / Block / Wing'} *
+                        </label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={walkInData.buildingId}
+                          disabled={loadingBuildings || hierarchyBuildings.length === 0}
+                          onChange={(e) => {
+                            const b = hierarchyBuildings.find(item => item._id === e.target.value);
+                            if (b) {
+                              handleWalkInBuildingSelect(b._id, b.name);
+                            } else {
+                              setWalkInData(prev => ({ ...prev, buildingId: '', buildingName: '' }));
+                            }
+                          }}
+                        >
+                          <option value="">
+                            {loadingBuildings ? 'Loading buildings...' : hierarchyBuildings.length === 0 ? 'No buildings' : '-- Select Building --'}
+                          </option>
+                          {hierarchyBuildings.map((bldg) => (
+                            <option key={bldg._id} value={bldg._id}>
+                              {bldg.name} {bldg.code ? `(${bldg.code})` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Floor Option Dropdown */}
+                      <div className="col-12 col-md-4">
+                        <label className="form-label small fw-semibold">
+                          {walkInData.propertyType === 'COMMERCIAL'
+                            ? 'Floor Plate / Level'
+                            : walkInData.propertyType === 'COWORKING'
+                            ? 'Zone / Floor'
+                            : 'Floor / Level'}
+                        </label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={walkInData.floorId}
+                          disabled={loadingFloors || (!walkInData.buildingId && hierarchyFloors.length === 0)}
+                          onChange={(e) => {
+                            const f = hierarchyFloors.find(item => item._id === e.target.value);
+                            if (f) {
+                              handleWalkInFloorSelect(f._id, f.floorName || `Floor ${f.floorNumber}`);
+                            } else {
+                              setWalkInData(prev => ({ ...prev, floorId: '', floorName: '' }));
+                              loadHierarchyUnits(undefined, walkInData.buildingId);
+                            }
+                          }}
+                        >
+                          <option value="">
+                            {loadingFloors ? 'Loading floors...' : hierarchyFloors.length === 0 ? 'All Floors' : '-- Select Floor --'}
+                          </option>
+                          {hierarchyFloors.map((flr) => (
+                            <option key={flr._id} value={flr._id}>
+                              {flr.floorName || `Floor ${flr.floorNumber}`} {flr.floorType ? `(${flr.floorType})` : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      {/* Dynamic Unit or Space Dropdown / Input */}
+                      <div className="col-12 col-md-4">
+                        <div className="d-flex justify-content-between align-items-center mb-1">
+                          <label className="form-label small fw-semibold mb-0">
+                            {walkInData.propertyType === 'COMMERCIAL'
+                              ? 'Office / Suite *'
+                              : walkInData.propertyType === 'COWORKING'
+                              ? 'Desk / Cabin / Space *'
+                              : 'Unit / Flat *'}
+                          </label>
+                          <button
+                            type="button"
+                            className="btn btn-link p-0 text-decoration-none small"
+                            style={{ fontSize: '0.75rem' }}
+                            onClick={() => {
+                              setManualUnitEntry(!manualUnitEntry);
+                              if (!manualUnitEntry) {
+                                setWalkInData(prev => ({ ...prev, unitId: '' }));
+                              }
+                            }}
+                          >
+                            {manualUnitEntry ? 'Select from list' : 'Type manually'}
+                          </button>
+                        </div>
+
+                        {manualUnitEntry ? (
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            required
+                            placeholder={
+                              walkInData.propertyType === 'COMMERCIAL' ? 'e.g. Suite 402' :
+                              walkInData.propertyType === 'COWORKING' ? 'e.g. Desk D-14' : 'e.g. Flat 301'
+                            }
+                            value={walkInData.unitNumber}
+                            onChange={(e) => setWalkInData(prev => ({ ...prev, unitNumber: e.target.value }))}
+                          />
+                        ) : (
+                          <select
+                            className="form-select form-select-sm"
+                            required
+                            value={walkInData.unitId}
+                            disabled={loadingUnits}
+                            onChange={(e) => handleWalkInUnitSelect(e.target.value)}
+                          >
+                            <option value="">
+                              {loadingUnits ? 'Loading spaces...' : hierarchyUnits.length === 0 ? '-- No units, type manually --' : '-- Choose Unit / Space --'}
+                            </option>
+                            {hierarchyUnits.map((u) => {
+                              const occupantName =
+                                walkInData.propertyType === 'RESIDENTIAL' ? u.currentResidentId?.name :
+                                walkInData.propertyType === 'COMMERCIAL' ? (u.currentTenantCompanyId?.companyName || u.currentTenantCompanyId?.contactPerson) :
+                                (u.currentMemberId?.memberName || u.currentMemberId?.companyName);
+                              
+                              return (
+                                <option key={u._id} value={u._id}>
+                                  {u.unitNumber} {occupantName ? `(${occupantName})` : '[Vacant]'}
+                                </option>
+                              );
+                            })}
+                            <option value="MANUAL">+ Type Custom Unit Number...</option>
+                          </select>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SECTION 3: HOST INFORMATION (Auto-populated from Unit) */}
+                  <div className="p-3 mb-3 rounded-3 border bg-white shadow-sm">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <span className="fw-bold small text-uppercase text-secondary tracking-wide">
+                        <i className="bi bi-person-badge me-1 text-primary"></i> 3. Host Details (Auto-filled from Selected Unit)
+                      </span>
+                      <span className="badge bg-secondary-subtle text-dark border">
+                        {walkInData.hostType}
+                      </span>
+                    </div>
+
+                    <div className="row g-3">
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">
+                          {walkInData.propertyType === 'COMMERCIAL'
+                            ? 'Host Name / Contact Person *'
+                            : walkInData.propertyType === 'COWORKING'
+                            ? 'Member / Host Name *'
+                            : 'Resident Host Name *'}
+                        </label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          required
+                          placeholder="e.g. John Doe"
+                          value={walkInData.hostName}
+                          onChange={(e) => setWalkInData({ ...walkInData, hostName: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Host Mobile / Extension</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="e.g. +91 9876543210"
+                          value={walkInData.hostMobile}
+                          onChange={(e) => setWalkInData({ ...walkInData, hostMobile: e.target.value })}
+                        />
+                      </div>
+
+                      {walkInData.propertyType !== 'RESIDENTIAL' && (
+                        <div className="col-12">
+                          <label className="form-label small fw-semibold">Company / Organisation Name</label>
+                          <input
+                            type="text"
+                            className="form-control form-control-sm"
+                            placeholder="e.g. Acme Technologies Ltd"
+                            value={walkInData.companyName}
+                            onChange={(e) => setWalkInData({ ...walkInData, companyName: e.target.value })}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* SECTION 4: VISITOR DETAILS */}
+                  <div className="p-3 mb-3 rounded-3 border bg-white shadow-sm">
+                    <span className="fw-bold small text-uppercase text-secondary tracking-wide d-block mb-2">
+                      <i className="bi bi-person me-1 text-primary"></i> 4. Visitor Personal Information
+                    </span>
+
+                    <div className="row g-3">
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Visitor Full Name *</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          required
+                          placeholder="Full Name"
+                          value={walkInData.visitorName}
+                          onChange={(e) => setWalkInData({ ...walkInData, visitorName: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Mobile Number *</label>
+                        <input
+                          type="tel"
+                          className="form-control form-control-sm"
+                          required
+                          placeholder="e.g. 9876543210"
+                          value={walkInData.mobile}
+                          onChange={(e) => setWalkInData({ ...walkInData, mobile: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Visitor Category / Type</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={walkInData.visitorType}
+                          onChange={(e) => setWalkInData({ ...walkInData, visitorType: e.target.value })}
+                        >
+                          {walkInData.propertyType === 'RESIDENTIAL' && (
+                            <>
+                              <option value="GUEST">Guest / Friend</option>
+                              <option value="FAMILY_VISITOR">Family Visitor</option>
+                              <option value="DELIVERY">Delivery / Courier</option>
+                              <option value="DOMESTIC_HELP">Domestic Help / Maid</option>
+                              <option value="CAB_DRIVER">Cab Driver (Uber/Ola)</option>
+                              <option value="SERVICE_TECHNICIAN">Service Technician</option>
+                              <option value="VENDOR">Vendor / Contractor</option>
+                            </>
+                          )}
+                          {walkInData.propertyType === 'COMMERCIAL' && (
+                            <>
+                              <option value="CLIENT">Client / Customer</option>
+                              <option value="BUSINESS_GUEST">Business Guest</option>
+                              <option value="INTERVIEW_CANDIDATE">Interview Candidate</option>
+                              <option value="COURIER">Courier / Parcel</option>
+                              <option value="SERVICE_ENGINEER">Service Engineer</option>
+                              <option value="CONTRACTOR">Contractor / Vendor</option>
+                              <option value="MEETING_VISITOR">Meeting Visitor</option>
+                            </>
+                          )}
+                          {walkInData.propertyType === 'COWORKING' && (
+                            <>
+                              <option value="MEETING_GUEST">Meeting Guest</option>
+                              <option value="EVENT_GUEST">Event Guest</option>
+                              <option value="TEMPORARY_MEMBER">Temporary Member</option>
+                              <option value="SERVICE_PROVIDER">Service Provider</option>
+                              <option value="TRAINING_PARTICIPANT">Training Participant</option>
+                              <option value="COMPANY_GUEST">Company Guest</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
+
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Purpose of Visit</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="e.g. Official Meeting, Personal"
+                          value={walkInData.purpose}
+                          onChange={(e) => setWalkInData({ ...walkInData, purpose: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SECTION 5: VEHICLE & SECURITY ADMISSION */}
+                  <div className="p-3 rounded-3 border bg-light">
+                    <span className="fw-bold small text-uppercase text-secondary tracking-wide d-block mb-2">
+                      <i className="bi bi-shield-check me-1 text-primary"></i> 5. Vehicle & Gate Admission
+                    </span>
+
+                    <div className="row g-3">
+                      <div className="col-12 col-md-6">
+                        <label className="form-label small fw-semibold">Vehicle Plate (Optional)</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm text-uppercase"
+                          placeholder="e.g. MH 02 AB 1234"
+                          value={walkInData.vehicleNumber}
+                          onChange={(e) => setWalkInData({ ...walkInData, vehicleNumber: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="col-12 col-md-3">
+                        <label className="form-label small fw-semibold">ID Proof Type</label>
+                        <select
+                          className="form-select form-select-sm"
+                          value={walkInData.idProofType}
+                          onChange={(e) => setWalkInData({ ...walkInData, idProofType: e.target.value })}
+                        >
+                          <option value="AADHAAR">Aadhaar Card</option>
+                          <option value="DRIVING_LICENSE">Driving License</option>
+                          <option value="PASSPORT">Passport</option>
+                          <option value="EMPLOYEE_ID">Employee ID</option>
+                          <option value="VOTER_ID">Voter ID</option>
+                          <option value="OTHER">Other</option>
+                        </select>
+                      </div>
+
+                      <div className="col-12 col-md-3">
+                        <label className="form-label small fw-semibold">ID Number (Optional)</label>
+                        <input
+                          type="text"
+                          className="form-control form-control-sm"
+                          placeholder="Last 4 digits or ID"
+                          value={walkInData.idProofNumber}
+                          onChange={(e) => setWalkInData({ ...walkInData, idProofNumber: e.target.value })}
+                        />
+                      </div>
+
+                      <div className="col-12">
+                        <div className="form-check form-switch mt-1">
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="autoCheckInSwitch"
+                            checked={walkInData.autoCheckIn}
+                            onChange={(e) => setWalkInData({ ...walkInData, autoCheckIn: e.target.checked })}
+                          />
+                          <label className="form-check-label small fw-semibold text-dark" htmlFor="autoCheckInSwitch">
+                            Admit & Check In immediately at security gate
+                          </label>
+                          <div className="text-secondary small" style={{ fontSize: '0.78rem' }}>
+                            When checked, the visitor pass is marked CHECKED_IN right away with current timestamp.
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div className="modal-footer bg-light px-4 py-3 border-top">
+                  <button type="button" className="btn btn-outline-secondary btn-sm px-3" onClick={() => setShowWalkInModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary btn-sm px-4 fw-bold shadow-sm d-flex align-items-center gap-2">
+                    <i className="bi bi-check2-circle fs-6"></i>
+                    <span>Register & Admit Visitor</span>
+                  </button>
                 </div>
               </form>
             </div>

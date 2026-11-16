@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,13 @@ import { CustomCursor } from '../components/common/CustomCursor';
 
 export default function LandingPage() {
   const { user } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isUserLoggedIn = mounted && Boolean(user);
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
   const [quoteSubmitted, setQuoteSubmitted] = useState(false);
   const [quoteForm, setQuoteForm] = useState({
@@ -78,11 +85,11 @@ export default function LandingPage() {
           {/* Login Button (Black Pill with Arrow) */}
           <div className="d-flex align-items-center gap-2">
             <Link
-              href={user ? '/dashboard' : '/login'}
+              href={isUserLoggedIn ? '/dashboard' : '/login'}
               className="btn btn-dark rounded-pill px-4 py-2 d-inline-flex align-items-center gap-2 fw-semibold shadow-sm"
               style={{ fontSize: '0.88rem', backgroundColor: '#000000', borderColor: '#000000' }}
             >
-              <span>{user ? 'Dashboard' : 'Login'}</span>
+              <span>{isUserLoggedIn ? 'Dashboard' : 'Login'}</span>
               <span>&rarr;</span>
             </Link>
           </div>

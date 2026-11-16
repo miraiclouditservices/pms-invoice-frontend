@@ -7,8 +7,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@miraiclouditservices.com');
+  const [password, setPassword] = useState('Password@123');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -316,6 +316,27 @@ export default function LoginPage() {
                     <i className="bi bi-arrow-right"></i>
                   </>
                 )}
+              </button>
+
+              {/* Quick Fill Mirai Cloud Account */}
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('admin@miraiclouditservices.com');
+                  setPassword('Password@123');
+                }}
+                className="btn btn-sm w-100 mt-2.5 d-flex align-items-center justify-content-center gap-1.5 border-0"
+                style={{
+                  backgroundColor: '#F0FDF4',
+                  color: '#166534',
+                  borderRadius: '10px',
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  padding: '7px 12px'
+                }}
+              >
+                <i className="bi bi-lightning-charge-fill text-success"></i>
+                <span>Quick Fill: Mirai Cloud IT Solutions</span>
               </button>
             </form>
           </div>

@@ -422,7 +422,7 @@ export default function CreateVisitorPage() {
                     <input
                       type="text"
                       className="form-control form-control-sm"
-                      placeholder="e.g. Nexus Cloud Technologies"
+                      placeholder="e.g. Mirai Cloud Technologies"
                       value={formData.companyName}
                       onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
                     />

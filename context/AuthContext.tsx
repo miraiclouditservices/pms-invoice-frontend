@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('pms_user');
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+        try { return JSON.parse(saved); } catch (e) { }
       }
     }
     return null;
@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('pms_organisation');
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+        try { return JSON.parse(saved); } catch (e) { }
       }
     }
     return null;
@@ -108,9 +108,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           localStorage.setItem('pms_active_property_id', matchedProp._id);
         }
       }
-    } catch (err) {
-      console.error('Failed to load profile', err);
-      logout();
+    } catch (err: any) {
+      if (err?.response?.status === 401) {
+        // Expired or invalid session token: quietly clean up credentials without noisy error logs
+        logout();
+      } else {
+        console.error('Failed to load profile', err);
+        logout();
+      }
     } finally {
       setLoading(false);
     }
@@ -184,7 +189,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return true; // Simplified for role actions
   };
 
-  const activePropertyType: 'RESIDENTIAL' | 'COMMERCIAL' | 'COWORKING' | 'ALL' = 
+  const activePropertyType: 'RESIDENTIAL' | 'COMMERCIAL' | 'COWORKING' | 'ALL' =
     (activeProperty?.propertyType?.toUpperCase() as any) ||
     (organisation?.type?.toUpperCase() as any) ||
     'ALL';

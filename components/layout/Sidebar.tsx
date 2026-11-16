@@ -539,8 +539,8 @@ export const Sidebar: React.FC = () => {
           <i className="bi bi-buildings-fill" style={{ fontSize: '0.95rem' }}></i>
         </div>
         <div className="flex-grow-1 overflow-hidden">
-          <h6 className="mb-0 text-white fw-bold text-truncate" style={{ fontSize: '0.88rem', letterSpacing: '0.02em', lineHeight: 1.2 }} title={organisation?.name || 'NexusPMS'}>
-            {organisation?.name || 'NexusPMS'}
+          <h6 className="mb-0 text-white fw-bold text-truncate" style={{ fontSize: '0.88rem', letterSpacing: '0.02em', lineHeight: 1.2 }} title={organisation?.name || 'Mirai PMS'}>
+            {organisation?.name || 'Mirai PMS'}
           </h6>
           {organisation?.type && (
             <div className="text-secondary text-truncate" style={{ fontSize: '0.64rem', lineHeight: 1, letterSpacing: '0.04em' }}>

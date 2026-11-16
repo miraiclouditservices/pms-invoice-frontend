@@ -178,11 +178,11 @@ export default function SettingsPage() {
               <div className="row g-3 mb-3">
                 <div className="col-md-6">
                   <label className="form-label small text-muted">Organisation Name</label>
-                  <input type="text" className="form-control form-control-sm" defaultValue={organisation?.name || 'Nexus Group'} readOnly />
+                  <input type="text" className="form-control form-control-sm" defaultValue={organisation?.name || 'Mirai Group'} readOnly />
                 </div>
                 <div className="col-md-6">
                   <label className="form-label small text-muted">Organisation Code</label>
-                  <input type="text" className="form-control form-control-sm" defaultValue={organisation?.code || 'NEXUS'} readOnly />
+                  <input type="text" className="form-control form-control-sm" defaultValue={organisation?.code || 'MIRAI'} readOnly />
                 </div>
               </div>
               <div className="row g-3 mb-3">
