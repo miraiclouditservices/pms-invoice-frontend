@@ -23,10 +23,10 @@ export default function PrivacyPolicyPage() {
           </div>
           <Link
             href="/"
-            className="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5 text-decoration-none fw-medium"
+            className="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center text-decoration-none fw-medium"
             style={{ fontSize: '0.85rem' }}
           >
-            <i className="bi bi-arrow-left"></i>
+            <i className="bi bi-arrow-left me-2"></i>
             <span>Back to Home</span>
           </Link>
         </div>
@@ -47,19 +47,19 @@ export default function PrivacyPolicyPage() {
           
           {/* Header Section */}
           <div className="border-bottom pb-4 mb-4" style={{ borderColor: '#E2E8F0' }}>
-            <h1 className="fw-bold text-dark mb-2" style={{ fontSize: 'calc(1.4rem + 1vw)', letterSpacing: '-0.02em' }}>
+            <h1 className="fw-bold text-dark mb-3" style={{ fontSize: 'calc(1.4rem + 1vw)', letterSpacing: '-0.02em' }}>
               Privacy Policy &ndash; Mirai PMS
             </h1>
             
-            <div className="d-flex flex-wrap align-items-center gap-3 pt-2 text-muted" style={{ fontSize: '0.88rem' }}>
-              <div className="d-flex align-items-center gap-1.5">
-                <i className="bi bi-calendar3 text-primary"></i>
-                <span><strong>Effective Date:</strong> 19 November 2026</span>
+            <div className="d-flex flex-wrap align-items-center gap-3 gap-md-4 pt-1 text-muted" style={{ fontSize: '0.9rem' }}>
+              <div className="d-inline-flex align-items-center">
+                <i className="bi bi-calendar3 text-primary me-2" style={{ fontSize: '1.05rem' }}></i>
+                <span><strong className="text-dark">Effective Date:</strong>&nbsp;19 November 2026</span>
               </div>
-              <span className="d-none d-sm-inline">&bull;</span>
-              <div className="d-flex align-items-center gap-1.5">
-                <i className="bi bi-clock-history text-primary"></i>
-                <span><strong>Last Updated:</strong> 19 November 2026</span>
+              <span className="text-secondary opacity-50 d-none d-sm-inline">&bull;</span>
+              <div className="d-inline-flex align-items-center">
+                <i className="bi bi-clock-history text-primary me-2" style={{ fontSize: '1.05rem' }}></i>
+                <span><strong className="text-dark">Last Updated:</strong>&nbsp;19 November 2026</span>
               </div>
             </div>
           </div>
@@ -486,7 +486,7 @@ export default function PrivacyPolicyPage() {
             <div className="row g-3 pt-2">
               
               <div className="col-12 col-md-6">
-                <div className="p-3.5 p-md-4 rounded-3 h-100" style={{ backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1' }}>
+                <div className="p-4 rounded-3 h-100" style={{ backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1' }}>
                   <h2 className="h6 fw-bold text-dark mb-2">17. Contact Us</h2>
                   <p className="mb-2" style={{ fontSize: '0.92rem' }}>
                     If you have questions, concerns, requests, or complaints regarding this Privacy Policy or the handling of personal information, please contact us:
@@ -510,7 +510,7 @@ export default function PrivacyPolicyPage() {
               </div>
 
               <div className="col-12 col-md-6">
-                <div className="p-3.5 p-md-4 rounded-3 h-100" style={{ backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1' }}>
+                <div className="p-4 rounded-3 h-100" style={{ backgroundColor: '#F8FAFC', border: '1px solid #CBD5E1' }}>
                   <h2 className="h6 fw-bold text-dark mb-2">18. Application Information</h2>
                   <div className="pt-1" style={{ fontSize: '0.92rem' }}>
                     <p className="mb-2">
