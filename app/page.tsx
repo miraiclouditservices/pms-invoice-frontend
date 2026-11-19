@@ -1257,6 +1257,7 @@ export default function LandingPage() {
                 <li><a href="#products" className="text-decoration-none" style={{ color: '#94A3B8' }}>Products</a></li>
                 <li><a href="#why-us" className="text-decoration-none" style={{ color: '#94A3B8' }}>Why Us</a></li>
                 <li><a href="#contact" className="text-decoration-none" style={{ color: '#94A3B8' }}>Contact</a></li>
+                <li><Link href="/privacy-policy" className="text-decoration-none hover-primary" style={{ color: '#94A3B8' }}>Privacy Policy</Link></li>
               </ul>
             </div>
 
@@ -1322,9 +1323,9 @@ export default function LandingPage() {
               &copy; 2026 Mirai Cloud IT Services. All rights reserved.
             </div>
             <div className="d-flex align-items-center gap-3">
-              <a href="#contact" className="text-decoration-none" style={{ color: '#64748B' }}>Privacy Policy</a>
+              <Link href="/privacy-policy" className="text-decoration-none hover-primary" style={{ color: '#94A3B8' }}>Privacy Policy</Link>
               <span>&bull;</span>
-              <a href="#contact" className="text-decoration-none" style={{ color: '#64748B' }}>Terms of Use</a>
+              <a href="#contact" className="text-decoration-none hover-primary" style={{ color: '#64748B' }}>Terms of Use</a>
             </div>
           </div>
         </div>
