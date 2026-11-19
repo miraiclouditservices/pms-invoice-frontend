@@ -13,7 +13,16 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
   const isPublicRoute = (path: string | null) => {
     if (!path) return false;
-    return path === '/' || path === '/login' || path.startsWith('/invoices/pay');
+    return (
+      path === '/' ||
+      path === '/login' ||
+      path === '/privacy-policy' ||
+      path.startsWith('/privacy-policy') ||
+      path.startsWith('/invoices/pay') ||
+      path.startsWith('/visitors/pass') ||
+      path.startsWith('/services') ||
+      path.startsWith('/about')
+    );
   };
 
   const isPublic = isPublicRoute(pathname);
